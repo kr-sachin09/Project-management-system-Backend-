@@ -1,0 +1,21 @@
+{
+  "name": "project-management-application",
+  "version": "1.0.0",
+  "description": "An application for project management",
+  "keywords": [
+    "Backend",
+    "technologies",
+    "APIs",
+    "creation"
+  ],
+  "license": "ISC",
+  "author": "Sachin Kumar",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6"
+  }
+}
