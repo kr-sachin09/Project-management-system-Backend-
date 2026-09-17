@@ -1,5 +1,7 @@
 import mongoose, {Schema} from "mongoose";
 import brcypt from "brcypt";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 
 const userSchema = new Schema(
@@ -68,6 +70,40 @@ userSchema.pre("save",async function(next){
     if(!this.isModified(this.password))return next();
     this.password = await brcypt.hash(this.password,10)
     next()
-})
+});
+
+userSchema.method.generateAccessToken = function (){
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      username: this.username,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {expiresIn:process.env.ACCESS_TOKEN_EXPIRY}
+  );
+};
+
+userSchema.method.generateRefreshToken = function (){
+  return jwt.sign(
+    {
+      _id:this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn:REFRESH_TOKEN_EXPIRY
+    }
+  )
+};
+
+userSchema.method.generateTemporaryToken = function (){
+  const unHashedtoken = crypto.randomBytes(20).toString("hex");
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(unHashedtoken)
+    .digest("hex")
+  const tokenExpiry = Date.now() + (20*60*1000);
+  return {unHashedtoken,hashedToken,tokenExpiry};
+}
 
 export const user = mongoose.model("user",userSchema);
