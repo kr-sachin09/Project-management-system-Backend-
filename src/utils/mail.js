@@ -1,4 +1,45 @@
 import Mailgen from "mailgen";
+import nodemailer from "nodemailer";
+
+
+const sendEmail = async (options)=>{
+  const mailGenerator = new Mailgen(
+    {
+      theme:"default",
+      product:{
+        name:"Task manager",
+        link:"https://taskmanagerlink.com"
+      }
+    });
+  
+  const emailTextual = mailGenerator.generatePlaintext(options.mailgenContent);
+  const emailHTML = mailGenerator.generate(options.mailgenContent);
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.MAIL_TRAP_HOST,
+    port: process.env.MAIL_TRAP_PORT,
+    auth: {
+      user: process.env.MAIL_TRAP_USER,
+      pass: process.env.MAIL_TRAP_PASS,
+    },
+  });
+
+  const mail ={
+    from:"projectmanagement@mail.com",
+    to:options.mail,
+    subject:options.subject,
+    text:emailTextual,
+    html:emailHTML,
+  };
+
+  try {
+    await transporter.sendMail(mail);
+  } catch (error) {
+    console.error("Error : ",error);
+    
+  }
+
+}
 
 const emailVerificationTemplate = (username, verificationUrl) => {
   return {
@@ -39,4 +80,5 @@ const forgotEmailTemplate = (username, forgotUrl) => {
 export {
     emailVerificationTemplate,
     forgotEmailTemplate,
+    sendEmail,
 };
