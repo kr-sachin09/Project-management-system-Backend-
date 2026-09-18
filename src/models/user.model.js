@@ -66,13 +66,12 @@ const userSchema = new Schema(
 }
 );
 
-userSchema.pre("save",async function(next){
-    if(!this.isModified(this.password))return next();
-    this.password = await bcrypt.hash(this.password,10)
-    next()
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
-userSchema.method.generateAccessToken = function (){
+userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
@@ -80,30 +79,30 @@ userSchema.method.generateAccessToken = function (){
       username: this.username,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    {expiresIn:process.env.ACCESS_TOKEN_EXPIRY}
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY },
   );
 };
 
-userSchema.method.generateRefreshToken = function (){
+userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
-      _id:this._id,
+      _id: this._id,
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn:REFRESH_TOKEN_EXPIRY
-    }
-  )
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY, // yaha bhi "process.env." missing tha
+    },
+  );
 };
 
-userSchema.method.generateTemporaryToken = function (){
+userSchema.methods.generateTemporaryToken = function () {
   const unHashedtoken = crypto.randomBytes(20).toString("hex");
   const hashedToken = crypto
     .createHash("sha256")
     .update(unHashedtoken)
-    .digest("hex")
-  const tokenExpiry = Date.now() + (20*60*1000);
-  return {unHashedtoken,hashedToken,tokenExpiry};
-}
+    .digest("hex");
+  const tokenExpiry = Date.now() + 20 * 60 * 1000;
+  return { unHashedtoken, hashedToken, tokenExpiry };
+};
 
 export const User = mongoose.model("user",userSchema);

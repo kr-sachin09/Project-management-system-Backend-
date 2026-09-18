@@ -26,7 +26,7 @@ const sendEmail = async (options)=>{
 
   const mail ={
     from:"projectmanagement@mail.com",
-    to:options.mail,
+    to:options.email,
     subject:options.subject,
     text:emailTextual,
     html:emailHTML,
@@ -36,7 +36,7 @@ const sendEmail = async (options)=>{
     await transporter.sendMail(mail);
   } catch (error) {
     console.error("Error : ",error);
-    
+    throw new Apierror(505, "Something is wrong in email sending");
   }
 
 }
@@ -45,7 +45,7 @@ const emailVerificationTemplate = (username, verificationUrl) => {
   return {
     body: {
       name: username,
-      intro: "Welcome to you website",
+      intro: "Welcome to Management website",
       action: {
         instructions: "To verify your email please click on following button",
         button: {
