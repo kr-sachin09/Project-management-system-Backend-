@@ -10,8 +10,8 @@ import { AvailableUserRole, userRoleEnum } from "../utils/constants.js";
 
 
 const getProjectById = asynchandler(async (req, res) => {
-  const { project_Id } = res.params;
-  const project = await Project.findById(project_Id);
+  const { projectId } = req.params;
+  const project = await Project.findById(projectId);
 
   if (!project) {
     throw new Apierror(404, "Project not found");
@@ -23,8 +23,8 @@ const getProjectById = asynchandler(async (req, res) => {
 });
 
 const getProjectMembers = asynchandler(async (req, res) => {
-  const { project_Id } = req.params;
-  const project = await Project.findById(project_Id);
+  const { projectId } = req.params;
+  const project = await Project.findById(projectId);
 
   if (!project) {
     throw new Apierror(404, "Project not found");
@@ -105,10 +105,10 @@ const createProject = asynchandler(async (req, res) => {
 
 const updateProject = asynchandler(async (req, res) => {
     const { name, description } = req.body; 
-    const {project_Id} = req.params
+    const {projectId} = req.params
 
     const project = await Project.findByIdAndUpdate(
-      project_Id,{
+      projectId,{
         name,
         description,
 
@@ -129,8 +129,8 @@ const updateProject = asynchandler(async (req, res) => {
 });
 
 const deleteProject = asynchandler(async (req, res) => {
-  const {project_id} = req.params
-  const project = await Project.findByIdAndDelete(project_id);
+  const {projectId} = req.params
+  const project = await Project.findByIdAndDelete(projectId);
 
   if (!project) {
     throw new Apierror(404, "Project not found");
@@ -141,8 +141,8 @@ const deleteProject = asynchandler(async (req, res) => {
 });
 
 const addMembersToProject = asynchandler(async (req, res) => {
-  const {email, role} = res.body
-  const {project_Id} = res.params
+  const {email, role} = req.body
+  const {projectId} = req.params
 
   const user = await User.findOne({email})
 
@@ -153,11 +153,11 @@ const addMembersToProject = asynchandler(async (req, res) => {
   await ProjectMember.findByIdAndUpdate(
     {
       user: new mongoose.Types.ObjectId(user._id),
-      project: new mongoose.Types.ObjectId(project_Id),
+      project: new mongoose.Types.ObjectId(projectId),
     },
     {
       user: new mongoose.Types.ObjectId(user._id),
-      project: new mongoose.Types.ObjectId(project_Id),
+      project: new mongoose.Types.ObjectId(projectId),
       role:role
     },{
       new:true,
@@ -230,7 +230,7 @@ const getProjects = asynchandler(async (req, res) => {
 });
 
 const updateMemberRole = asynchandler(async (req, res) => {
-  const {project_Id, user_id} = res.params
+  const {projectId, userId} = req.params
   const {new_role} = res.body
 
   if(!AvailableUserRole.includes(new_role)){
@@ -238,8 +238,8 @@ const updateMemberRole = asynchandler(async (req, res) => {
   }
 
   let projectmember = await ProjectMember.findOne({
-    user:new mongoose.Types.ObjectId(user_id),
-    project:new mongoose.Types.ObjectId(project_Id)
+    user:new mongoose.Types.ObjectId(userId),
+    project:new mongoose.Types.ObjectId(projectId)
   })
 
   if (!projectmember) {
@@ -268,11 +268,11 @@ const updateMemberRole = asynchandler(async (req, res) => {
 });
 
 const deleteMember = asynchandler(async (req, res) => {
-  const { project_Id, user_id } = res.params;
+  const { projectId, userId } = req.params;
 
   let projectmember = await ProjectMember.findOne({
-    user: new mongoose.Types.ObjectId(user_id),
-    project: new mongoose.Types.ObjectId(project_Id),
+    user: new mongoose.Types.ObjectId(userId),
+    project: new mongoose.Types.ObjectId(projectId),
   });
 
   if (!projectmember) {

@@ -31,7 +31,7 @@ export const virifyJwt = asynchandler(async (req, res, next)=>{
 })
 
 export const validateProjectPermission = (roles = []) =>{
-  asynchandler(async (req, res, next)=>{
+  return asynchandler(async (req, res, next)=>{
     const {projectId} = req.params
 
     if(!projectId){
